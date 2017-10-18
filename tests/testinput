@@ -1,0 +1,13 @@
+join(int sumL | int sumR) returns sum locals (int sum) {
+	   sum = sumL + sumR;
+}
+
+sequential (int* s, int n) returns sum locals (int i, int sum) {
+	   mts = 0;
+	   sum = 0;
+	   i = 0;
+	   for(i = 0; i <= n; i++) {
+	   	 sum = sum + s[i];
+		 mts = max(mts + s[i], 0);
+	   }
+}
