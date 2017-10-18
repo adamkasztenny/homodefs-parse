@@ -97,18 +97,13 @@ class NodeVisitor(object):
             self.visit(c)
 
 
-class Assignments(Node):
-    __slots__ = ('lvalue', 'rvalue')
+class Argument(Node):
+    __slots__ = ('type', 'name')
 
-    def __init__(self, lval, rval):
-        self.lvalue = lval
-        self.rvalue = rval
+    def __init__(self, type, name):
+        self.type = type
+        self.name = name
 
-    def children(self):
-        nodelist = []
-        if self.lvalue is not None: nodelist.append(("lvalue", self.lvalue))
-        if self.rvalue is not None: nodelist.append(("rvalue", self.rvalue))
-        return tuple(nodelist)
 
 class BinaryExpr(Node):
     __slots__ = ('op', 'lexpr','rexpr')
@@ -166,9 +161,78 @@ class ArrayAccess(Node):
         return tuple(nodelist)
 
 class ConditionalExpression(Node):
-    __slots__ = ('condition', 'branch_true', 'branch_false')
+    __slots__ = ('condition', 'lexpr', 'rexpr')
 
     def __init__(self, cond, btrue, bfalse):
         self.condition = cond
-        self.branch_true = btrue
-        self.branch_false = bfalse
+        self.lexpr = btrue
+        self.rexpr = bfalse
+
+
+class Block(Node):
+    __slots__ = ('statements')
+
+    def __init__(self, statements):
+        self.statements = statements
+
+
+class Assignment(Node):
+    __slots__ = ('lvalue', 'rvalue')
+
+    def __init__(self, lval, rval):
+        self.lvalue = lval
+        self.rvalue = rval
+
+    def children(self):
+        nodelist = []
+        if self.lvalue is not None: nodelist.append(("lvalue", self.lvalue))
+        if self.rvalue is not None: nodelist.append(("rvalue", self.rvalue))
+        return tuple(nodelist)
+
+
+class SelectionStatement(Node):
+    __slots__ = ('cond', 'thenb', 'elseb')
+
+    def __init__(self, cond, thenb, elseb):
+        self.cond = cond
+        self.thenb = thenb
+        self.elseb = elseb
+
+
+class IterationStatement(Node):
+    __slots__ = ('init', 'guard', 'update', 'body')
+
+    def __init__(self, init, guard, update, body):
+        self.init = init
+        self.guard = guard
+        self.update = update
+        self.body = body
+
+
+class JoinSpec(Node):
+    __slots__ = ('argsl', 'argsr', 'returns', 'locals', 'body')
+
+    def __init__(self, argsl, argsr, returns, flocals, body):
+        self.argsl = argsl
+        self.argsr = argsr
+        self.returns = returns
+        self.locals = flocals
+        self.body = body
+
+
+class SequentialSpec(Node):
+    __slots__ = ('args', 'returns', 'locals', 'body')
+
+    def __init__(self, args, returns, flocals, body):
+        self.args = args
+        self.returns = returns
+        self.locals = flocals
+        self.body = body
+
+
+class Program(Node):
+    __slots__ = ('sequential', 'join')
+
+    def __init__(self, seq, join):
+        self.sequential = seq
+        self.join = join

@@ -18,7 +18,8 @@ reserved = {
     'int' : 'INT',
     'float' : 'FLOAT',
     'bool' : 'BOOL',
-    'return' : 'RETURN'
+    'returns' : 'RETURNS',
+    'locals' : 'LOCALS'
 }
 
 tokens = [

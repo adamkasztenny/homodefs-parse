@@ -4,6 +4,7 @@ import homparser.homdeflex
 data = open('tests/testinput').read()
 
 lexer = homparser.homdeflex.lexer
+parser = homparser.homdefyacc.parser
 
 # Give the lexer some input
 lexer.input(data)
