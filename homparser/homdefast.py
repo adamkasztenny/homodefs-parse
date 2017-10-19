@@ -1,5 +1,5 @@
 import sys
-
+import utils
 
 class Node(object):
     __slots__ = ()
@@ -33,12 +33,12 @@ class Node(object):
         else:
             buf.write(lead + self.__class__.__name__+ ': ')
 
-        if self.attr_names:
+        if self.__slots__:
             if attrnames:
-                nvlist = [(n, getattr(self,n)) for n in self.attr_names]
+                nvlist = [(n, getattr(self, n)) for n in self.__slots__]
                 attrstr = ', '.join('%s=%s' % nv for nv in nvlist)
             else:
-                vlist = [getattr(self, n) for n in self.attr_names]
+                vlist = [getattr(self, n) for n in self.__slots__]
                 attrstr = ', '.join('%s' % v for v in vlist)
             buf.write(attrstr)
 
@@ -46,14 +46,6 @@ class Node(object):
             buf.write(' (at %s)' % self.coord)
         buf.write('\n')
 
-        for (child_name, child) in self.children():
-            child.show(
-                buf,
-                offset=offset + 2,
-                attrnames=attrnames,
-                nodenames=nodenames,
-                showcoord=showcoord,
-                _my_node_name=child_name)
 
 
 class NodeVisitor(object):
@@ -105,7 +97,18 @@ class Type(Node):
         self.baseType = bt
 
 
-class Var(Node):
+
+def isexpression(e):
+    return (isinstance(e, BinaryExpr) | isinstance(e, UnaryExpr) | isinstance(e, Constant) |
+            isinstance(e, ConditionalExpression) | isinstance(e, Var) | isinstance(e, FunctionCall) |
+            isinstance(e, ArrayAccess))
+
+
+class Expression(Node):
+    pass
+
+
+class Var(Expression):
     __slots__ = ('name', 'type', 'id')
 
     def __init__(self, name, type):
@@ -113,7 +116,8 @@ class Var(Node):
         self.type = type
         self.id = -1
 
-class Constant(Node):
+
+class Constant(Expression):
     __slots__ = ('value')
 
     def __init__(self, val):
@@ -127,8 +131,11 @@ class Argument(Node):
         self.type = type
         self.name = name
 
+    def wf(self):
+        return isinstance(self.type, Type) & isinstance(self.name, Var)
 
-class BinaryExpr(Node):
+
+class BinaryExpr(Expression):
     __slots__ = ('op', 'lexpr','rexpr')
 
     def __init__(self, op, lexpr, rexpr):
@@ -142,8 +149,11 @@ class BinaryExpr(Node):
         if self.rexpr is not None: nodelist.append(("rexpr", self.rexpr))
         return tuple(nodelist)
 
+    def wf(self):
+        return isinstance(self.lexpr, Expression) & isinstance(self.rexpr, Expression)
 
-class UnaryExpr(Node):
+
+class UnaryExpr(Expression):
     __slots__ = ('op', 'expr')
 
     def __init__(self, op, e):
@@ -155,8 +165,11 @@ class UnaryExpr(Node):
         if self.expr is not None: nodelist.append(("expr", self.expr))
         return tuple(nodelist)
 
+    def wf(self):
+        return isinstance(self.expr, Expression)
 
-class FunctionCall(Node):
+
+class FunctionCall(Expression):
     __slots__ = ('name', 'args')
 
     def __init__(self, funcname, funcargs):
@@ -169,8 +182,11 @@ class FunctionCall(Node):
         if self.args is not None: nodelist.append(("args", self.args))
         return tuple(nodelist)
 
+    def wf(self):
+        return isinstance(self.name, Var) & utils.isinstance_list(self.args, Argument)
 
-class ArrayAccess(Node):
+
+class ArrayAccess(Expression):
     __slots__ = ('name', 'subscript')
 
     def __init__(self, arrayname, arraysubscript):
@@ -183,7 +199,11 @@ class ArrayAccess(Node):
         if self.subscript is not None: nodelist.append(("subscript", self.subscript))
         return tuple(nodelist)
 
-class ConditionalExpression(Node):
+    def wf(self):
+        return utils.isinstance_list([self.name, self.subscript], Expression)
+
+
+class ConditionalExpression(Expression):
     __slots__ = ('condition', 'lexpr', 'rexpr')
 
     def __init__(self, cond, btrue, bfalse):
@@ -192,14 +212,32 @@ class ConditionalExpression(Node):
         self.rexpr = bfalse
 
 
-class Block(Node):
+    def wf(self):
+        return utils.isinstance_list([self.condition, self.lexpr, self.rexpr], Expression)
+
+
+# Statement kind
+def isstatement(s):
+    return (isinstance(s, Block) | isinstance(s, Assignment) | isinstance(s, IterationStatement) |
+            isinstance(s, SelectionStatement))
+
+
+# Make all statement kinds superclasses of Statement
+class Statement(Node):
+    pass
+
+
+class Block(Statement):
     __slots__ = ('statements')
 
     def __init__(self, statements):
         self.statements = statements
 
+    def wf(self):
+        return utils.isinstance_list(self.statements, Statement)
 
-class Assignment(Node):
+
+class Assignment(Statement):
     __slots__ = ('lvalue', 'rvalue')
 
     def __init__(self, lval, rval):
@@ -212,8 +250,11 @@ class Assignment(Node):
         if self.rvalue is not None: nodelist.append(("rvalue", self.rvalue))
         return tuple(nodelist)
 
+    def wf(self):
+        return isexpression(self.lvalue) & isexpression(self.rvalue)
 
-class SelectionStatement(Node):
+
+class SelectionStatement(Statement):
     __slots__ = ('cond', 'thenb', 'elseb')
 
     def __init__(self, cond, thenb, elseb):
@@ -221,8 +262,11 @@ class SelectionStatement(Node):
         self.thenb = thenb
         self.elseb = elseb
 
+    def wf(self):
+        return isexpression(self.cond) & isstatement(self.thenb) & isstatement(self.elseb)
 
-class IterationStatement(Node):
+
+class IterationStatement(Statement):
     __slots__ = ('init', 'guard', 'update', 'body')
 
     def __init__(self, init, guard, update, body):
@@ -230,6 +274,10 @@ class IterationStatement(Node):
         self.guard = guard
         self.update = update
         self.body = body
+
+    def wf(self):
+        return (isinstance(self.init, Assignment) & isinstance(self.guard, BinaryExpr) &
+                isinstance(self.update, Assignment) & isinstance(self.body, Block))
 
 
 class JoinSpec(Node):
@@ -242,6 +290,11 @@ class JoinSpec(Node):
         self.locals = flocals
         self.body = body
 
+    def wf(self):
+        return (utils.isinstance_list(self.argsl, Argument) & utils.isinstance_list(self.argsr, Argument) &
+                utils.isinstance_list(self.returns, Var) &
+                utils.isinstance_list(self.locals, Argument) & isinstance(self.body, Block))
+
 
 class SequentialSpec(Node):
     __slots__ = ('args', 'returns', 'locals', 'body')
@@ -252,6 +305,10 @@ class SequentialSpec(Node):
         self.locals = flocals
         self.body = body
 
+    def wf(self):
+        return (utils.isinstance_list(self.args, Argument) & utils.isinstance_list(self.returns, Var) &
+                utils.isinstance_list(self.locals, Argument) & isinstance(self.body, Block))
+
 
 class Program(Node):
     __slots__ = ('join', 'sequential')
@@ -259,3 +316,8 @@ class Program(Node):
     def __init__(self, join, seq):
         self.sequential = seq
         self.join = join
+
+    def wf(self):
+        return isinstance(self.sequential, SequentialSpec) & isinstance(self.join, JoinSpec)
+
+
