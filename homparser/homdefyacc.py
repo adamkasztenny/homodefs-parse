@@ -2,6 +2,12 @@ import ply.yacc as yacc
 from homdeflex import tokens
 import homdefast as ast
 
+precedence = (
+    ('nonassoc',    'IFX'),
+    ('nonassoc',    'ELSE'),
+)
+
+
 def p_program(p):
     '''program : joinspec sequentialspec'''
     p[0] = ast.Program(p[1], p[2])
@@ -28,7 +34,10 @@ def p_sequentialspec(p):
 # List or arguments
 def p_arglist_mutliple(p):
     ''' arglist : arglist COMMA arg'''
-    p[0] = p[1].append(p[3])
+    if p[1] is []:
+        p[0] = p[1].append(p[3])
+    else:
+        p[0] = [p[3]]
 
 def p_arglist_singleton(p):
     '''arglist : arg'''
@@ -39,21 +48,26 @@ def p_arglist_empy(p):
     '''arglist :'''
     p[0] = list()
 
-
 def p_arg(p):
     '''arg : type IDENT'''
-    p[0] = ast.Argument(p[0], p[1])
+    p[0] = ast.Argument(p[1], ast.Var(p[2], p[1]))
 
+def p_arglist_error(p):
+    '''arg : error'''
+    print "Argument error"
 
 # List of identifiers
 def p_identlist_singleton(p):
-    '''identlist : IDENT'''
-    p[0] = list(p[1])
+    '''identlist : identifier'''
+    p[0] = [p[1]]
 
 
 def p_identlist_mutliple(p):
-    '''identlist : IDENT COMMA identlist'''
-    p[0] = list(p[1]).extend(p[3])
+    '''identlist : identifier COMMA identlist'''
+    if p[1] is []:
+        p[0] = p[1].append(p[3])
+    else:
+        p[0] = list(p[3])
 
 
 def p_identlist_empty(p):
@@ -73,10 +87,13 @@ def p_constant(p):
 
 def p_postfixExpr(p):
     '''postfixExpression : constant
-    | IDENT
+    | identifier
     | LPAREN expression RPAREN'''
     p[0] = p[1]
 
+def p_identifer(p):
+    '''identifier : IDENT'''
+    p[0] = ast.Var(p[0], None)
 
 def p_postfixExpr_array_access(p):
     '''postfixExpression : postfixExpression LBRACKET expression RBRACKET'''
@@ -123,7 +140,7 @@ def p_multop(p):
 
 
 def p_additiveExpr_id(p):
-    '''additiveExpression : unaryExpression'''
+    '''additiveExpression : multiplicativeExpression'''
     p[0] = p[1]
 
 
@@ -239,6 +256,13 @@ def p_assignment(p):
     '''assignmentStatement : postfixExpression EQ expression'''
     p[0] = ast.Assignment(p[1], p[3])
 
+def p_assignment_increment(p):
+    '''assignmentStatement : IDENT PLUS PLUS'''
+    p[0] = ast.Assignment(p[1], ast.BinaryExpr(p[2], p[1], ast.Constant(0)))
+
+def p_assignment_decrement(p):
+    '''assignmentStatement : IDENT MINUS MINUS'''
+    p[0] = ast.Assignment(p[1], ast.BinaryExpr(p[2], p[1], ast.Constant(0)))
 
 def p_assignment_rh_error(p):
     '''assignmentStatement : postfixExpression EQ error'''
@@ -268,7 +292,7 @@ def p_conditional2(p):
 
 
 def p_conditional(p):
-    '''selectionStatement : IF LPAREN expression RPAREN statement'''
+    '''selectionStatement : IF LPAREN expression RPAREN statement %prec IFX'''
     p[0] = ast.SelectionStatement(p[3], p[5], None)
 
 
@@ -281,9 +305,7 @@ def p_block(p):
     '''block : LBRACE statementlist RBRACE'''
     p[0] = ast.Block(p[2])
 
-def p_block_error(p):
-    '''block : LBRACE error RBRACE'''
-    print "Bad body in block."
+
 # Types
 
 

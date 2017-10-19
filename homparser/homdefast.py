@@ -105,6 +105,14 @@ class Type(Node):
         self.baseType = bt
 
 
+class Var(Node):
+    __slots__ = ('name', 'type', 'id')
+
+    def __init__(self, name, type):
+        self.name = name
+        self.type = type
+        self.id = -1
+
 class Constant(Node):
     __slots__ = ('value')
 
