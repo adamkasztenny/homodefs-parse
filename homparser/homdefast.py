@@ -254,8 +254,8 @@ class SequentialSpec(Node):
 
 
 class Program(Node):
-    __slots__ = ('sequential', 'join')
+    __slots__ = ('join', 'sequential')
 
-    def __init__(self, seq, join):
+    def __init__(self, join, seq):
         self.sequential = seq
         self.join = join

@@ -4,10 +4,10 @@ Grammar
 
 Rule 0     S' -> program
 Rule 1     program -> joinspec sequentialspec
-Rule 2     joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN block
+Rule 2     joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN statement
 Rule 3     joinspec -> JOIN error RPAREN block
 Rule 4     joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN error
-Rule 5     sequentialspec -> SEQUENTIAL LPAREN arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN block
+Rule 5     sequentialspec -> SEQUENTIAL LPAREN arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN statement
 Rule 6     arglist -> arglist COMMA arg
 Rule 7     arglist -> arg
 Rule 8     arglist -> <empty>
@@ -132,7 +132,7 @@ andExpression        : 48 49 50
 arg                  : 6 7
 arglist              : 2 2 2 4 4 4 5 5 6
 assignmentStatement  : 64 71 71
-block                : 2 3 5 67
+block                : 3 67
 compop               : 38
 conditionalExpression : 53
 constant             : 17
@@ -152,7 +152,7 @@ program              : 0
 relationalExpression : 38 43 44
 selectionStatement   : 66
 sequentialspec       : 1
-statement            : 57 69 69 70 71
+statement            : 2 5 57 69 69 70 71
 statementlist        : 57 72
 type                 : 9 76
 unaryExpression      : 23 29 30
@@ -164,7 +164,7 @@ state 0
 
     (0) S' -> . program
     (1) program -> . joinspec sequentialspec
-    (2) joinspec -> . JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN block
+    (2) joinspec -> . JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN statement
     (3) joinspec -> . JOIN error RPAREN block
     (4) joinspec -> . JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN error
 
@@ -175,7 +175,7 @@ state 0
 
 state 1
 
-    (2) joinspec -> JOIN . LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN block
+    (2) joinspec -> JOIN . LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN statement
     (3) joinspec -> JOIN . error RPAREN block
     (4) joinspec -> JOIN . LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN error
 
@@ -186,7 +186,7 @@ state 1
 state 2
 
     (1) program -> joinspec . sequentialspec
-    (5) sequentialspec -> . SEQUENTIAL LPAREN arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN block
+    (5) sequentialspec -> . SEQUENTIAL LPAREN arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN statement
 
     SEQUENTIAL      shift and go to state 7
 
@@ -200,7 +200,7 @@ state 3
 
 state 4
 
-    (2) joinspec -> JOIN LPAREN . arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN block
+    (2) joinspec -> JOIN LPAREN . arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN statement
     (4) joinspec -> JOIN LPAREN . arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN error
     (6) arglist -> . arglist COMMA arg
     (7) arglist -> . arg
@@ -214,12 +214,12 @@ state 4
 
     SEPARE          reduce using rule 8 (arglist -> .)
     COMMA           reduce using rule 8 (arglist -> .)
-    error           shift and go to state 12
+    error           shift and go to state 13
     INT             shift and go to state 8
     FLOAT           shift and go to state 11
-    BOOL            shift and go to state 14
+    BOOL            shift and go to state 12
 
-    arglist                        shift and go to state 13
+    arglist                        shift and go to state 14
     type                           shift and go to state 9
     arg                            shift and go to state 10
 
@@ -239,7 +239,7 @@ state 6
 
 state 7
 
-    (5) sequentialspec -> SEQUENTIAL . LPAREN arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN block
+    (5) sequentialspec -> SEQUENTIAL . LPAREN arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN statement
 
     LPAREN          shift and go to state 16
 
@@ -280,6 +280,14 @@ state 11
 
 state 12
 
+    (75) type -> BOOL .
+
+    IDENT           reduce using rule 75 (type -> BOOL .)
+    TIMES           reduce using rule 75 (type -> BOOL .)
+
+
+state 13
+
     (10) arg -> error .
 
     SEPARE          reduce using rule 10 (arg -> error .)
@@ -287,22 +295,14 @@ state 12
     RPAREN          reduce using rule 10 (arg -> error .)
 
 
-state 13
+state 14
 
-    (2) joinspec -> JOIN LPAREN arglist . SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN block
+    (2) joinspec -> JOIN LPAREN arglist . SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN statement
     (4) joinspec -> JOIN LPAREN arglist . SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN error
     (6) arglist -> arglist . COMMA arg
 
     SEPARE          shift and go to state 20
     COMMA           shift and go to state 19
-
-
-state 14
-
-    (75) type -> BOOL .
-
-    IDENT           reduce using rule 75 (type -> BOOL .)
-    TIMES           reduce using rule 75 (type -> BOOL .)
 
 
 state 15
@@ -316,7 +316,7 @@ state 15
 
 state 16
 
-    (5) sequentialspec -> SEQUENTIAL LPAREN . arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN block
+    (5) sequentialspec -> SEQUENTIAL LPAREN . arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN statement
     (6) arglist -> . arglist COMMA arg
     (7) arglist -> . arg
     (8) arglist -> .
@@ -329,10 +329,10 @@ state 16
 
     RPAREN          reduce using rule 8 (arglist -> .)
     COMMA           reduce using rule 8 (arglist -> .)
-    error           shift and go to state 12
+    error           shift and go to state 13
     INT             shift and go to state 8
     FLOAT           shift and go to state 11
-    BOOL            shift and go to state 14
+    BOOL            shift and go to state 12
 
     arglist                        shift and go to state 23
     type                           shift and go to state 9
@@ -365,17 +365,17 @@ state 19
     (75) type -> . BOOL
     (76) type -> . type TIMES
 
-    error           shift and go to state 12
+    error           shift and go to state 13
     INT             shift and go to state 8
     FLOAT           shift and go to state 11
-    BOOL            shift and go to state 14
+    BOOL            shift and go to state 12
 
     type                           shift and go to state 9
     arg                            shift and go to state 24
 
 state 20
 
-    (2) joinspec -> JOIN LPAREN arglist SEPARE . arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN block
+    (2) joinspec -> JOIN LPAREN arglist SEPARE . arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN statement
     (4) joinspec -> JOIN LPAREN arglist SEPARE . arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN error
     (6) arglist -> . arglist COMMA arg
     (7) arglist -> . arg
@@ -389,10 +389,10 @@ state 20
 
     RPAREN          reduce using rule 8 (arglist -> .)
     COMMA           reduce using rule 8 (arglist -> .)
-    error           shift and go to state 12
+    error           shift and go to state 13
     INT             shift and go to state 8
     FLOAT           shift and go to state 11
-    BOOL            shift and go to state 14
+    BOOL            shift and go to state 12
 
     arglist                        shift and go to state 25
     type                           shift and go to state 9
@@ -426,7 +426,7 @@ state 22
 
 state 23
 
-    (5) sequentialspec -> SEQUENTIAL LPAREN arglist . RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN block
+    (5) sequentialspec -> SEQUENTIAL LPAREN arglist . RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN statement
     (6) arglist -> arglist . COMMA arg
 
     RPAREN          shift and go to state 27
@@ -444,7 +444,7 @@ state 24
 
 state 25
 
-    (2) joinspec -> JOIN LPAREN arglist SEPARE arglist . RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN block
+    (2) joinspec -> JOIN LPAREN arglist SEPARE arglist . RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN statement
     (4) joinspec -> JOIN LPAREN arglist SEPARE arglist . RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN error
     (6) arglist -> arglist . COMMA arg
 
@@ -502,14 +502,14 @@ state 26
 
 state 27
 
-    (5) sequentialspec -> SEQUENTIAL LPAREN arglist RPAREN . RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN block
+    (5) sequentialspec -> SEQUENTIAL LPAREN arglist RPAREN . RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN statement
 
     RETURNS         shift and go to state 46
 
 
 state 28
 
-    (2) joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN . RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN block
+    (2) joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN . RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN statement
     (4) joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN . RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN error
 
     RETURNS         shift and go to state 47
@@ -535,10 +535,10 @@ state 29
     OR              reduce using rule 17 (postfixExpression -> constant .)
     SEMICOLON       reduce using rule 17 (postfixExpression -> constant .)
     RPAREN          reduce using rule 17 (postfixExpression -> constant .)
+    EQ              reduce using rule 17 (postfixExpression -> constant .)
     COMMA           reduce using rule 17 (postfixExpression -> constant .)
     RBRACKET        reduce using rule 17 (postfixExpression -> constant .)
     COLON           reduce using rule 17 (postfixExpression -> constant .)
-    EQ              reduce using rule 17 (postfixExpression -> constant .)
 
 
 state 30
@@ -597,6 +597,7 @@ state 32
 
     (66) statement -> selectionStatement .
 
+    SEQUENTIAL      reduce using rule 66 (statement -> selectionStatement .)
     ELSE            reduce using rule 66 (statement -> selectionStatement .)
     RBRACE          reduce using rule 66 (statement -> selectionStatement .)
     error           reduce using rule 66 (statement -> selectionStatement .)
@@ -608,6 +609,7 @@ state 32
     NUMBER          reduce using rule 66 (statement -> selectionStatement .)
     TRUE            reduce using rule 66 (statement -> selectionStatement .)
     FALSE           reduce using rule 66 (statement -> selectionStatement .)
+    $end            reduce using rule 66 (statement -> selectionStatement .)
 
 
 state 33
@@ -735,6 +737,7 @@ state 39
 
     (65) statement -> iterationStatement .
 
+    SEQUENTIAL      reduce using rule 65 (statement -> iterationStatement .)
     ELSE            reduce using rule 65 (statement -> iterationStatement .)
     RBRACE          reduce using rule 65 (statement -> iterationStatement .)
     error           reduce using rule 65 (statement -> iterationStatement .)
@@ -746,6 +749,7 @@ state 39
     NUMBER          reduce using rule 65 (statement -> iterationStatement .)
     TRUE            reduce using rule 65 (statement -> iterationStatement .)
     FALSE           reduce using rule 65 (statement -> iterationStatement .)
+    $end            reduce using rule 65 (statement -> iterationStatement .)
 
 
 state 40
@@ -821,16 +825,17 @@ state 44
     OR              reduce using rule 18 (postfixExpression -> identifier .)
     SEMICOLON       reduce using rule 18 (postfixExpression -> identifier .)
     RPAREN          reduce using rule 18 (postfixExpression -> identifier .)
+    EQ              reduce using rule 18 (postfixExpression -> identifier .)
     COMMA           reduce using rule 18 (postfixExpression -> identifier .)
     RBRACKET        reduce using rule 18 (postfixExpression -> identifier .)
     COLON           reduce using rule 18 (postfixExpression -> identifier .)
-    EQ              reduce using rule 18 (postfixExpression -> identifier .)
 
 
 state 45
 
     (67) statement -> block .
 
+    SEQUENTIAL      reduce using rule 67 (statement -> block .)
     ELSE            reduce using rule 67 (statement -> block .)
     RBRACE          reduce using rule 67 (statement -> block .)
     error           reduce using rule 67 (statement -> block .)
@@ -842,18 +847,19 @@ state 45
     NUMBER          reduce using rule 67 (statement -> block .)
     TRUE            reduce using rule 67 (statement -> block .)
     FALSE           reduce using rule 67 (statement -> block .)
+    $end            reduce using rule 67 (statement -> block .)
 
 
 state 46
 
-    (5) sequentialspec -> SEQUENTIAL LPAREN arglist RPAREN RETURNS . LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN block
+    (5) sequentialspec -> SEQUENTIAL LPAREN arglist RPAREN RETURNS . LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN statement
 
     LPAREN          shift and go to state 74
 
 
 state 47
 
-    (2) joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS . LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN block
+    (2) joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS . LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN statement
     (4) joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS . LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN error
 
     LPAREN          shift and go to state 75
@@ -863,6 +869,7 @@ state 48
 
     (64) statement -> assignmentStatement SEMICOLON .
 
+    SEQUENTIAL      reduce using rule 64 (statement -> assignmentStatement SEMICOLON .)
     ELSE            reduce using rule 64 (statement -> assignmentStatement SEMICOLON .)
     RBRACE          reduce using rule 64 (statement -> assignmentStatement SEMICOLON .)
     error           reduce using rule 64 (statement -> assignmentStatement SEMICOLON .)
@@ -874,6 +881,7 @@ state 48
     NUMBER          reduce using rule 64 (statement -> assignmentStatement SEMICOLON .)
     TRUE            reduce using rule 64 (statement -> assignmentStatement SEMICOLON .)
     FALSE           reduce using rule 64 (statement -> assignmentStatement SEMICOLON .)
+    $end            reduce using rule 64 (statement -> assignmentStatement SEMICOLON .)
 
 
 state 49
@@ -1543,6 +1551,7 @@ state 73
 
     (68) statement -> error SEMICOLON .
 
+    SEQUENTIAL      reduce using rule 68 (statement -> error SEMICOLON .)
     ELSE            reduce using rule 68 (statement -> error SEMICOLON .)
     RBRACE          reduce using rule 68 (statement -> error SEMICOLON .)
     error           reduce using rule 68 (statement -> error SEMICOLON .)
@@ -1554,11 +1563,12 @@ state 73
     NUMBER          reduce using rule 68 (statement -> error SEMICOLON .)
     TRUE            reduce using rule 68 (statement -> error SEMICOLON .)
     FALSE           reduce using rule 68 (statement -> error SEMICOLON .)
+    $end            reduce using rule 68 (statement -> error SEMICOLON .)
 
 
 state 74
 
-    (5) sequentialspec -> SEQUENTIAL LPAREN arglist RPAREN RETURNS LPAREN . identlist RPAREN LOCALS LPAREN arglist RPAREN block
+    (5) sequentialspec -> SEQUENTIAL LPAREN arglist RPAREN RETURNS LPAREN . identlist RPAREN LOCALS LPAREN arglist RPAREN statement
     (11) identlist -> . identifier
     (12) identlist -> . identifier COMMA identlist
     (13) identlist -> .
@@ -1572,7 +1582,7 @@ state 74
 
 state 75
 
-    (2) joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN . identlist RPAREN LOCALS LPAREN arglist RPAREN block
+    (2) joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN . identlist RPAREN LOCALS LPAREN arglist RPAREN statement
     (4) joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN . identlist RPAREN LOCALS LPAREN arglist RPAREN error
     (11) identlist -> . identifier
     (12) identlist -> . identifier COMMA identlist
@@ -2139,10 +2149,10 @@ state 100
     OR              reduce using rule 19 (postfixExpression -> LPAREN expression RPAREN .)
     SEMICOLON       reduce using rule 19 (postfixExpression -> LPAREN expression RPAREN .)
     RPAREN          reduce using rule 19 (postfixExpression -> LPAREN expression RPAREN .)
+    EQ              reduce using rule 19 (postfixExpression -> LPAREN expression RPAREN .)
     COMMA           reduce using rule 19 (postfixExpression -> LPAREN expression RPAREN .)
     RBRACKET        reduce using rule 19 (postfixExpression -> LPAREN expression RPAREN .)
     COLON           reduce using rule 19 (postfixExpression -> LPAREN expression RPAREN .)
-    EQ              reduce using rule 19 (postfixExpression -> LPAREN expression RPAREN .)
 
 
 state 101
@@ -2186,7 +2196,7 @@ state 105
 
 state 106
 
-    (5) sequentialspec -> SEQUENTIAL LPAREN arglist RPAREN RETURNS LPAREN identlist . RPAREN LOCALS LPAREN arglist RPAREN block
+    (5) sequentialspec -> SEQUENTIAL LPAREN arglist RPAREN RETURNS LPAREN identlist . RPAREN LOCALS LPAREN arglist RPAREN statement
 
     RPAREN          shift and go to state 122
 
@@ -2210,7 +2220,7 @@ state 108
 
 state 109
 
-    (2) joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist . RPAREN LOCALS LPAREN arglist RPAREN block
+    (2) joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist . RPAREN LOCALS LPAREN arglist RPAREN statement
     (4) joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist . RPAREN LOCALS LPAREN arglist RPAREN error
 
     RPAREN          shift and go to state 124
@@ -2236,10 +2246,10 @@ state 110
     OR              reduce using rule 22 (postfixExpression -> IDENT LPAREN expressionlist RPAREN .)
     SEMICOLON       reduce using rule 22 (postfixExpression -> IDENT LPAREN expressionlist RPAREN .)
     RPAREN          reduce using rule 22 (postfixExpression -> IDENT LPAREN expressionlist RPAREN .)
+    EQ              reduce using rule 22 (postfixExpression -> IDENT LPAREN expressionlist RPAREN .)
     COMMA           reduce using rule 22 (postfixExpression -> IDENT LPAREN expressionlist RPAREN .)
     RBRACKET        reduce using rule 22 (postfixExpression -> IDENT LPAREN expressionlist RPAREN .)
     COLON           reduce using rule 22 (postfixExpression -> IDENT LPAREN expressionlist RPAREN .)
-    EQ              reduce using rule 22 (postfixExpression -> IDENT LPAREN expressionlist RPAREN .)
 
 
 state 111
@@ -2571,15 +2581,15 @@ state 121
     OR              reduce using rule 21 (postfixExpression -> postfixExpression LBRACKET expression RBRACKET .)
     SEMICOLON       reduce using rule 21 (postfixExpression -> postfixExpression LBRACKET expression RBRACKET .)
     RPAREN          reduce using rule 21 (postfixExpression -> postfixExpression LBRACKET expression RBRACKET .)
+    EQ              reduce using rule 21 (postfixExpression -> postfixExpression LBRACKET expression RBRACKET .)
     COMMA           reduce using rule 21 (postfixExpression -> postfixExpression LBRACKET expression RBRACKET .)
     RBRACKET        reduce using rule 21 (postfixExpression -> postfixExpression LBRACKET expression RBRACKET .)
     COLON           reduce using rule 21 (postfixExpression -> postfixExpression LBRACKET expression RBRACKET .)
-    EQ              reduce using rule 21 (postfixExpression -> postfixExpression LBRACKET expression RBRACKET .)
 
 
 state 122
 
-    (5) sequentialspec -> SEQUENTIAL LPAREN arglist RPAREN RETURNS LPAREN identlist RPAREN . LOCALS LPAREN arglist RPAREN block
+    (5) sequentialspec -> SEQUENTIAL LPAREN arglist RPAREN RETURNS LPAREN identlist RPAREN . LOCALS LPAREN arglist RPAREN statement
 
     LOCALS          shift and go to state 129
 
@@ -2600,7 +2610,7 @@ state 123
 
 state 124
 
-    (2) joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN . LOCALS LPAREN arglist RPAREN block
+    (2) joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN . LOCALS LPAREN arglist RPAREN statement
     (4) joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN . LOCALS LPAREN arglist RPAREN error
 
     LOCALS          shift and go to state 131
@@ -2695,13 +2705,15 @@ state 128
     NUMBER          reduce using rule 70 (selectionStatement -> IF LPAREN expression RPAREN statement .)
     TRUE            reduce using rule 70 (selectionStatement -> IF LPAREN expression RPAREN statement .)
     FALSE           reduce using rule 70 (selectionStatement -> IF LPAREN expression RPAREN statement .)
+    SEQUENTIAL      reduce using rule 70 (selectionStatement -> IF LPAREN expression RPAREN statement .)
+    $end            reduce using rule 70 (selectionStatement -> IF LPAREN expression RPAREN statement .)
 
   ! ELSE            [ reduce using rule 70 (selectionStatement -> IF LPAREN expression RPAREN statement .) ]
 
 
 state 129
 
-    (5) sequentialspec -> SEQUENTIAL LPAREN arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS . LPAREN arglist RPAREN block
+    (5) sequentialspec -> SEQUENTIAL LPAREN arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS . LPAREN arglist RPAREN statement
 
     LPAREN          shift and go to state 135
 
@@ -2715,7 +2727,7 @@ state 130
 
 state 131
 
-    (2) joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS . LPAREN arglist RPAREN block
+    (2) joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS . LPAREN arglist RPAREN statement
     (4) joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS . LPAREN arglist RPAREN error
 
     LPAREN          shift and go to state 136
@@ -2810,7 +2822,7 @@ state 134
 
 state 135
 
-    (5) sequentialspec -> SEQUENTIAL LPAREN arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN . arglist RPAREN block
+    (5) sequentialspec -> SEQUENTIAL LPAREN arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN . arglist RPAREN statement
     (6) arglist -> . arglist COMMA arg
     (7) arglist -> . arg
     (8) arglist -> .
@@ -2823,10 +2835,10 @@ state 135
 
     RPAREN          reduce using rule 8 (arglist -> .)
     COMMA           reduce using rule 8 (arglist -> .)
-    error           shift and go to state 12
+    error           shift and go to state 13
     INT             shift and go to state 8
     FLOAT           shift and go to state 11
-    BOOL            shift and go to state 14
+    BOOL            shift and go to state 12
 
     arglist                        shift and go to state 139
     type                           shift and go to state 9
@@ -2834,7 +2846,7 @@ state 135
 
 state 136
 
-    (2) joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN . arglist RPAREN block
+    (2) joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN . arglist RPAREN statement
     (4) joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN . arglist RPAREN error
     (6) arglist -> . arglist COMMA arg
     (7) arglist -> . arg
@@ -2848,10 +2860,10 @@ state 136
 
     RPAREN          reduce using rule 8 (arglist -> .)
     COMMA           reduce using rule 8 (arglist -> .)
-    error           shift and go to state 12
+    error           shift and go to state 13
     INT             shift and go to state 8
     FLOAT           shift and go to state 11
-    BOOL            shift and go to state 14
+    BOOL            shift and go to state 12
 
     arglist                        shift and go to state 140
     type                           shift and go to state 9
@@ -2878,12 +2890,14 @@ state 138
     NUMBER          reduce using rule 69 (selectionStatement -> IF LPAREN expression RPAREN statement ELSE statement .)
     TRUE            reduce using rule 69 (selectionStatement -> IF LPAREN expression RPAREN statement ELSE statement .)
     FALSE           reduce using rule 69 (selectionStatement -> IF LPAREN expression RPAREN statement ELSE statement .)
+    SEQUENTIAL      reduce using rule 69 (selectionStatement -> IF LPAREN expression RPAREN statement ELSE statement .)
     ELSE            reduce using rule 69 (selectionStatement -> IF LPAREN expression RPAREN statement ELSE statement .)
+    $end            reduce using rule 69 (selectionStatement -> IF LPAREN expression RPAREN statement ELSE statement .)
 
 
 state 139
 
-    (5) sequentialspec -> SEQUENTIAL LPAREN arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist . RPAREN block
+    (5) sequentialspec -> SEQUENTIAL LPAREN arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist . RPAREN statement
     (6) arglist -> arglist . COMMA arg
 
     RPAREN          shift and go to state 142
@@ -2892,7 +2906,7 @@ state 139
 
 state 140
 
-    (2) joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist . RPAREN block
+    (2) joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist . RPAREN statement
     (4) joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist . RPAREN error
     (6) arglist -> arglist . COMMA arg
 
@@ -2948,23 +2962,96 @@ state 141
 
 state 142
 
-    (5) sequentialspec -> SEQUENTIAL LPAREN arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN . block
+    (5) sequentialspec -> SEQUENTIAL LPAREN arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN . statement
+    (64) statement -> . assignmentStatement SEMICOLON
+    (65) statement -> . iterationStatement
+    (66) statement -> . selectionStatement
+    (67) statement -> . block
+    (68) statement -> . error SEMICOLON
+    (59) assignmentStatement -> . postfixExpression EQ expression
+    (60) assignmentStatement -> . IDENT PLUS PLUS
+    (61) assignmentStatement -> . IDENT MINUS MINUS
+    (62) assignmentStatement -> . postfixExpression EQ error
+    (63) assignmentStatement -> . error EQ expression
+    (71) iterationStatement -> . FOR LPAREN assignmentStatement SEMICOLON expression SEMICOLON assignmentStatement RPAREN statement
+    (69) selectionStatement -> . IF LPAREN expression RPAREN statement ELSE statement
+    (70) selectionStatement -> . IF LPAREN expression RPAREN statement
     (72) block -> . LBRACE statementlist RBRACE
+    (17) postfixExpression -> . constant
+    (18) postfixExpression -> . identifier
+    (19) postfixExpression -> . LPAREN expression RPAREN
+    (21) postfixExpression -> . postfixExpression LBRACKET expression RBRACKET
+    (22) postfixExpression -> . IDENT LPAREN expressionlist RPAREN
+    (14) constant -> . NUMBER
+    (15) constant -> . TRUE
+    (16) constant -> . FALSE
+    (20) identifier -> . IDENT
 
+    error           shift and go to state 43
+    IDENT           shift and go to state 35
+    FOR             shift and go to state 37
+    IF              shift and go to state 40
     LBRACE          shift and go to state 21
+    LPAREN          shift and go to state 38
+    NUMBER          shift and go to state 30
+    TRUE            shift and go to state 31
+    FALSE           shift and go to state 42
 
-    block                          shift and go to state 145
+    postfixExpression              shift and go to state 41
+    constant                       shift and go to state 29
+    identifier                     shift and go to state 44
+    block                          shift and go to state 45
+    statement                      shift and go to state 145
+    assignmentStatement            shift and go to state 34
+    iterationStatement             shift and go to state 39
+    selectionStatement             shift and go to state 32
 
 state 143
 
-    (2) joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN . block
+    (2) joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN . statement
     (4) joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN . error
+    (64) statement -> . assignmentStatement SEMICOLON
+    (65) statement -> . iterationStatement
+    (66) statement -> . selectionStatement
+    (67) statement -> . block
+    (68) statement -> . error SEMICOLON
+    (59) assignmentStatement -> . postfixExpression EQ expression
+    (60) assignmentStatement -> . IDENT PLUS PLUS
+    (61) assignmentStatement -> . IDENT MINUS MINUS
+    (62) assignmentStatement -> . postfixExpression EQ error
+    (63) assignmentStatement -> . error EQ expression
+    (71) iterationStatement -> . FOR LPAREN assignmentStatement SEMICOLON expression SEMICOLON assignmentStatement RPAREN statement
+    (69) selectionStatement -> . IF LPAREN expression RPAREN statement ELSE statement
+    (70) selectionStatement -> . IF LPAREN expression RPAREN statement
     (72) block -> . LBRACE statementlist RBRACE
+    (17) postfixExpression -> . constant
+    (18) postfixExpression -> . identifier
+    (19) postfixExpression -> . LPAREN expression RPAREN
+    (21) postfixExpression -> . postfixExpression LBRACKET expression RBRACKET
+    (22) postfixExpression -> . IDENT LPAREN expressionlist RPAREN
+    (14) constant -> . NUMBER
+    (15) constant -> . TRUE
+    (16) constant -> . FALSE
+    (20) identifier -> . IDENT
 
     error           shift and go to state 147
+    IDENT           shift and go to state 35
+    FOR             shift and go to state 37
+    IF              shift and go to state 40
     LBRACE          shift and go to state 21
+    LPAREN          shift and go to state 38
+    NUMBER          shift and go to state 30
+    TRUE            shift and go to state 31
+    FALSE           shift and go to state 42
 
-    block                          shift and go to state 146
+    postfixExpression              shift and go to state 41
+    constant                       shift and go to state 29
+    identifier                     shift and go to state 44
+    block                          shift and go to state 45
+    statement                      shift and go to state 146
+    assignmentStatement            shift and go to state 34
+    iterationStatement             shift and go to state 39
+    selectionStatement             shift and go to state 32
 
 state 144
 
@@ -2981,25 +3068,31 @@ state 144
     NUMBER          reduce using rule 71 (iterationStatement -> FOR LPAREN assignmentStatement SEMICOLON expression SEMICOLON assignmentStatement RPAREN statement .)
     TRUE            reduce using rule 71 (iterationStatement -> FOR LPAREN assignmentStatement SEMICOLON expression SEMICOLON assignmentStatement RPAREN statement .)
     FALSE           reduce using rule 71 (iterationStatement -> FOR LPAREN assignmentStatement SEMICOLON expression SEMICOLON assignmentStatement RPAREN statement .)
+    $end            reduce using rule 71 (iterationStatement -> FOR LPAREN assignmentStatement SEMICOLON expression SEMICOLON assignmentStatement RPAREN statement .)
+    SEQUENTIAL      reduce using rule 71 (iterationStatement -> FOR LPAREN assignmentStatement SEMICOLON expression SEMICOLON assignmentStatement RPAREN statement .)
 
 
 state 145
 
-    (5) sequentialspec -> SEQUENTIAL LPAREN arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN block .
+    (5) sequentialspec -> SEQUENTIAL LPAREN arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN statement .
 
-    $end            reduce using rule 5 (sequentialspec -> SEQUENTIAL LPAREN arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN block .)
+    $end            reduce using rule 5 (sequentialspec -> SEQUENTIAL LPAREN arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN statement .)
 
 
 state 146
 
-    (2) joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN block .
+    (2) joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN statement .
 
-    SEQUENTIAL      reduce using rule 2 (joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN block .)
+    SEQUENTIAL      reduce using rule 2 (joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN statement .)
 
 
 state 147
 
     (4) joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN error .
+    (68) statement -> error . SEMICOLON
+    (63) assignmentStatement -> error . EQ expression
 
     SEQUENTIAL      reduce using rule 4 (joinspec -> JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN error .)
+    SEMICOLON       shift and go to state 73
+    EQ              shift and go to state 72
 

@@ -14,8 +14,8 @@ def p_program(p):
 
 
 def p_joinspec(p):
-    '''joinspec : JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN block'''
-    p[0] = ast.JoinSpec(p[3], p[5], p[8], p[10], p[11])
+    '''joinspec : JOIN LPAREN arglist SEPARE arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN statement'''
+    p[0] = ast.JoinSpec(p[3], p[5], p[9], p[13], p[15])
 
 
 def p_joinspec_decl_error(p):
@@ -27,8 +27,8 @@ def p_joinspec_body_error(p):
     print "Bad join body."
 
 def p_sequentialspec(p):
-    '''sequentialspec : SEQUENTIAL LPAREN arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN block'''
-    p[0] = ast.SequentialSpec(p[3], p[7], p[11], p[13],)
+    '''sequentialspec : SEQUENTIAL LPAREN arglist RPAREN RETURNS LPAREN identlist RPAREN LOCALS LPAREN arglist RPAREN statement'''
+    p[0] = ast.SequentialSpec(p[3], p[7], p[11], p[13])
 
 
 # List or arguments
@@ -313,11 +313,11 @@ def p_type_base(p):
     '''type : INT
     | FLOAT
     | BOOL'''
-    p[0] = ast.Type(False, p[1])
+    p[0] = ast.Type(p[1], False)
 
 def p_type_ptr(p):
     '''type : type TIMES'''
-    p[0] = ast.Type(True, p[1])
+    p[0] = ast.Type(p[1], True)
 
 
 def p_error(p):
