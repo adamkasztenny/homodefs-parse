@@ -97,6 +97,21 @@ class NodeVisitor(object):
             self.visit(c)
 
 
+class Type(Node):
+    __slots__ = ('isPointer', 'baseType')
+
+    def __init__(self,bt, pt):
+        self.isPointer = pt
+        self.baseType = bt
+
+
+class Constant(Node):
+    __slots__ = ('value')
+
+    def __init__(self, val):
+        self.value = val
+
+
 class Argument(Node):
     __slots__ = ('type', 'name')
 

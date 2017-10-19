@@ -7,19 +7,17 @@ import ply.lex as lex
 # List of token names.   This is always required
 reserved = {
     'if' : 'IF',
-    'then' : 'THEN',
     'else' : 'ELSE',
-    'while' : 'WHILE',
     'for' : 'FOR',
     'join' : 'JOIN',
     'sequential' : 'SEQUENTIAL',
-    'min' : 'MIN',
-    'max' : 'MAX',
     'int' : 'INT',
     'float' : 'FLOAT',
     'bool' : 'BOOL',
     'returns' : 'RETURNS',
-    'locals' : 'LOCALS'
+    'locals' : 'LOCALS',
+    'True' : 'TRUE',
+    'False' : 'FALSE'
 }
 
 tokens = [
@@ -27,9 +25,9 @@ tokens = [
     'COLON',
     'COMMA',
     'DIV',
-    'EOF',
     'EQ',
     'EQEQ',
+    'EXCLAMATION',
     'GEQ',
     'GT',
     'IDENT',
@@ -39,7 +37,7 @@ tokens = [
     'LPAREN',
     'LT',
     'MINUS',
-    'EXCLAMATION',
+    'NEQ',
     'NUMBER',
     'OR',
     'PLUS',
@@ -48,6 +46,7 @@ tokens = [
     'RBRACKET',
     'RPAREN',
     'SEMICOLON',
+    'TILDE',
     'SEPARE',
     'TIMES',
 ] + list(reserved.values())
@@ -61,8 +60,8 @@ t_BOOL = r'bool'
 t_AND = r'\&\&'
 t_COLON = r'\:'
 t_COMMA = r'\,'
-t_EQ = r'='
-t_EQEQ = r'=='
+t_EQ = r'\='
+t_EQEQ = r'\=\='
 t_GEQ = r'>='
 t_GT = r'>'
 t_JOIN = r'join'
@@ -70,9 +69,8 @@ t_LBRACE = r'\{'
 t_LBRACKET = r'\['
 t_LEQ = r'<='
 t_LT = r'<'
-t_MAX = r'max'
-t_MIN = r'min'
 t_MINUS = r'-'
+t_NEQ = r'\!\='
 t_EXCLAMATION = r'!'
 t_OR = r'\|\|'
 t_PLUS = r'\+'
@@ -81,7 +79,7 @@ t_RBRACE = r'\}'
 t_RBRACKET = r'\]'
 t_SEMICOLON = r'\;'
 t_SEPARE = '\|'
-t_SEQUENTIAL = r'sequential'
+t_TILDE = r'\~'
 t_TIMES   = r'\*'
 t_DIV  = r'/'
 t_LPAREN  = r'\('
